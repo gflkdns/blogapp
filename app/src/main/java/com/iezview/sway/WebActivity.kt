@@ -31,10 +31,10 @@ class WebActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-//        if (web_view.canGoBack() && keyCode == KeyEvent.KEYCODE_BACK) {
-//            web_view.goBack()
-//            return true
-//        }
+        if (web_view.canGoBack() && keyCode == KeyEvent.KEYCODE_BACK) {
+            web_view.goBack()
+            return true
+        }
         return super.onKeyDown(keyCode, event)
     }
 }
