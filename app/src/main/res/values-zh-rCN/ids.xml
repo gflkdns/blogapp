@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="mail_subject" type="id">"来自imaster.top"</item>
+    <item name="mail_text" type="id"> </item>
+</resources>

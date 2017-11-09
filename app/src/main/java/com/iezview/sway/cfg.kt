@@ -5,4 +5,5 @@ package com.iezview.sway
  */
 object cfg {
     val url = "http://imaster.top"
+//    val url = "http://192.168.1.123:4000/miqtinfo/"
 }
