@@ -31,6 +31,9 @@ import android.os.Handler
 import android.webkit.*
 import com.umeng.socialize.media.UMImage
 import com.umeng.socialize.media.UMWeb
+import android.webkit.WebSettings.LayoutAlgorithm
+import com.iezview.sway.R.id.webView
+import android.webkit.WebSettings
 
 
 /**
@@ -46,21 +49,24 @@ class WebActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web)
         findView()
         settingView()
-        if (Build.VERSION.SDK_INT >= 23) {
-            val pm = packageManager
-            val permission = PackageManager.PERMISSION_GRANTED == pm.checkPermission("android.permission.WRITE_EXTERNAL_STORAGE", packageName)
-            if (!permission) {
-                val mPermissionList = arrayOf<String>(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CALL_PHONE, Manifest.permission.READ_LOGS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.SET_DEBUG_APP, Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.GET_ACCOUNTS, Manifest.permission.WRITE_APN_SETTINGS)
-                ActivityCompat.requestPermissions(this, mPermissionList, 123)
-            }
-
-        }
+        checkPermission()
 
         web_view.loadUrl(cfg.url)
         Handler().postDelayed({
             javascriptShare("标题", "http://img4.imgtn.bdimg.com/it/u=128308122,770382628&fm=27&gp=0.jpg", "https://www.duitang.com/", "这里是描述")
         }, 3000)
 
+    }
+
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            val pm = packageManager
+            val permission = PackageManager.PERMISSION_GRANTED == pm.checkPermission("android.permission.WRITE_EXTERNAL_STORAGE", packageName)
+            if (!permission) {
+                val mPermissionList = arrayOf<String>(WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, CALL_PHONE, READ_LOGS, READ_PHONE_STATE, READ_EXTERNAL_STORAGE, SET_DEBUG_APP, SYSTEM_ALERT_WINDOW, GET_ACCOUNTS, WRITE_APN_SETTINGS)
+                ActivityCompat.requestPermissions(this, mPermissionList, 123)
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -73,7 +79,7 @@ class WebActivity : AppCompatActivity() {
         val web = UMWeb(url, title, text, UMImage(this, imgUrl))
         ShareAction(this)
                 .withMedia(web)
-                .setDisplayList(SHARE_MEDIA.QQ,SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN,SHARE_MEDIA.WEIXIN_CIRCLE)
+                .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
                 .setCallback(umShareListener)
                 .open()
     }
@@ -84,6 +90,7 @@ class WebActivity : AppCompatActivity() {
     }
 
     private fun settingRefview() {
+        srl_layout.isEnabled = false
         srl_layout.setColorSchemeColors(Color.RED, Color.GRAY)
         srl_layout.setOnRefreshListener {
             web_view.loadUrl(web_view.url)
@@ -97,6 +104,9 @@ class WebActivity : AppCompatActivity() {
 
     private fun settingWebView() {
         web_view.settings.javaScriptEnabled = true
+        web_view.settings.layoutAlgorithm = LayoutAlgorithm.SINGLE_COLUMN
+        web_view.settings.useWideViewPort = true
+        web_view.settings.loadWithOverviewMode = true
         web_view.setWebViewClient(object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
