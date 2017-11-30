@@ -34,6 +34,7 @@ import com.umeng.socialize.media.UMWeb
 import android.webkit.WebSettings.LayoutAlgorithm
 import com.iezview.sway.R.id.webView
 import android.webkit.WebSettings
+import android.widget.Toast
 
 
 /**
@@ -52,9 +53,6 @@ class WebActivity : AppCompatActivity() {
         checkPermission()
 
         web_view.loadUrl(cfg.url)
-        Handler().postDelayed({
-            javascriptShare("标题", "http://img4.imgtn.bdimg.com/it/u=128308122,770382628&fm=27&gp=0.jpg", "https://www.duitang.com/", "这里是描述")
-        }, 3000)
 
     }
 
@@ -74,15 +72,6 @@ class WebActivity : AppCompatActivity() {
 
     }
 
-    @JavascriptInterface
-    private fun javascriptShare(title: String, imgUrl: String, url: String, text: String) {
-        val web = UMWeb(url, title, text, UMImage(this, imgUrl))
-        ShareAction(this)
-                .withMedia(web)
-                .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
-                .setCallback(umShareListener)
-                .open()
-    }
 
     private fun settingView() {
         settingRefview()
@@ -103,10 +92,11 @@ class WebActivity : AppCompatActivity() {
     }
 
     private fun settingWebView() {
-        web_view.settings.javaScriptEnabled = true
         web_view.settings.layoutAlgorithm = LayoutAlgorithm.SINGLE_COLUMN
         web_view.settings.useWideViewPort = true
         web_view.settings.loadWithOverviewMode = true
+        web_view.settings.javaScriptEnabled = true
+        web_view.addJavascriptInterface(JSHook(), "share")
         web_view.setWebViewClient(object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -173,7 +163,24 @@ class WebActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
+
+    inner class JSHook {
+        @JavascriptInterface
+        fun javascriptShare(title: String, imgUrl: String, url: String, text: String) {
+            val web = UMWeb(url)
+            web.setThumb(UMImage(this@WebActivity, imgUrl))
+            web.title = title
+            web.description = text
+            ShareAction(this@WebActivity)
+                    .withMedia(web)
+                    .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
+                    .setCallback(umShareListener)
+                    .open()
+        }
+
+    }
 }
+
 
 object umShareListener : UMShareListener {
     override fun onResult(p0: SHARE_MEDIA?) {
