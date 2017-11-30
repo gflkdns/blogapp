@@ -18,6 +18,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+        debug {
+            storeFile file('F:\\sway_web\\sway.jks')
+            storePassword "123456"
+            keyAlias "sway"
+            keyPassword "123456"
+        }
+    }
+
 }
 
 dependencies {

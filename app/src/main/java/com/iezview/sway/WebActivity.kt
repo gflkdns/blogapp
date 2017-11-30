@@ -1,17 +1,37 @@
 package com.iezview.sway
 
+import android.Manifest
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.support.v4.widget.SwipeRefreshLayout
-import android.webkit.WebChromeClient
+import com.umeng.socialize.UMShareAPI
+import android.support.v4.app.ActivityCompat
+import android.Manifest.permission
+import android.Manifest.permission.WRITE_APN_SETTINGS
+import android.Manifest.permission.GET_ACCOUNTS
+import android.Manifest.permission.SYSTEM_ALERT_WINDOW
+import android.Manifest.permission.SET_DEBUG_APP
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_PHONE_STATE
+import android.Manifest.permission.READ_LOGS
+import android.Manifest.permission.CALL_PHONE
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import com.umeng.socialize.ShareAction
+import com.umeng.socialize.UMShareListener
+import com.umeng.socialize.bean.SHARE_MEDIA
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.os.Handler
+import android.webkit.*
+import com.umeng.socialize.media.UMImage
+import com.umeng.socialize.media.UMWeb
+
 
 /**
  * 网页展示界面
@@ -26,8 +46,36 @@ class WebActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web)
         findView()
         settingView()
+        if (Build.VERSION.SDK_INT >= 23) {
+            val pm = packageManager
+            val permission = PackageManager.PERMISSION_GRANTED == pm.checkPermission("android.permission.WRITE_EXTERNAL_STORAGE", packageName)
+            if (!permission) {
+                val mPermissionList = arrayOf<String>(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CALL_PHONE, Manifest.permission.READ_LOGS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.SET_DEBUG_APP, Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.GET_ACCOUNTS, Manifest.permission.WRITE_APN_SETTINGS)
+                ActivityCompat.requestPermissions(this, mPermissionList, 123)
+            }
+
+        }
 
         web_view.loadUrl(cfg.url)
+        Handler().postDelayed({
+            javascriptShare("标题", "http://img4.imgtn.bdimg.com/it/u=128308122,770382628&fm=27&gp=0.jpg", "https://www.duitang.com/", "这里是描述")
+        }, 3000)
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+
+    }
+
+    @JavascriptInterface
+    private fun javascriptShare(title: String, imgUrl: String, url: String, text: String) {
+        val web = UMWeb(url, title, text, UMImage(this, imgUrl))
+        ShareAction(this)
+                .withMedia(web)
+                .setDisplayList(SHARE_MEDIA.QQ,SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN,SHARE_MEDIA.WEIXIN_CIRCLE)
+                .setCallback(umShareListener)
+                .open()
     }
 
     private fun settingView() {
@@ -40,6 +88,11 @@ class WebActivity : AppCompatActivity() {
         srl_layout.setOnRefreshListener {
             web_view.loadUrl(web_view.url)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        super.onActivityResult(requestCode, resultCode, data)
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data)
     }
 
     private fun settingWebView() {
@@ -56,8 +109,6 @@ class WebActivity : AppCompatActivity() {
                     //打电话
                         url.contains("tel") -> callTo(url)
                     }
-
-
                 }
                 return true
             }
@@ -112,4 +163,19 @@ class WebActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
+}
+
+object umShareListener : UMShareListener {
+    override fun onResult(p0: SHARE_MEDIA?) {
+    }
+
+    override fun onCancel(p0: SHARE_MEDIA?) {
+    }
+
+    override fun onError(p0: SHARE_MEDIA?, p1: Throwable?) {
+    }
+
+    override fun onStart(p0: SHARE_MEDIA?) {
+    }
+
 }
