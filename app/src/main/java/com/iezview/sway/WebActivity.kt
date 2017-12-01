@@ -1,40 +1,27 @@
 package com.iezview.sway
 
-import android.Manifest
-import android.os.Build
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.view.KeyEvent
+import android.Manifest.permission.*
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.support.v4.widget.SwipeRefreshLayout
-import com.umeng.socialize.UMShareAPI
+import android.os.Build
+import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.Manifest.permission
-import android.Manifest.permission.WRITE_APN_SETTINGS
-import android.Manifest.permission.GET_ACCOUNTS
-import android.Manifest.permission.SYSTEM_ALERT_WINDOW
-import android.Manifest.permission.SET_DEBUG_APP
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_PHONE_STATE
-import android.Manifest.permission.READ_LOGS
-import android.Manifest.permission.CALL_PHONE
-import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
+import android.webkit.*
+import android.webkit.WebSettings.LayoutAlgorithm
+import android.widget.Toast
 import com.umeng.socialize.ShareAction
+import com.umeng.socialize.UMShareAPI
 import com.umeng.socialize.UMShareListener
 import com.umeng.socialize.bean.SHARE_MEDIA
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.os.Handler
-import android.webkit.*
 import com.umeng.socialize.media.UMImage
 import com.umeng.socialize.media.UMWeb
-import android.webkit.WebSettings.LayoutAlgorithm
-import com.iezview.sway.R.id.webView
-import android.webkit.WebSettings
-import android.widget.Toast
+import okhttp3.*
+import java.io.IOException
 
 
 /**
@@ -51,9 +38,32 @@ class WebActivity : AppCompatActivity() {
         findView()
         settingView()
         checkPermission()
+        loadUrl()
 
-        web_view.loadUrl(cfg.url)
+    }
 
+    /**
+     * 访问服务器获取根路径并加载网页
+     */
+    private fun loadUrl() {
+        OkHttpClient().newCall(Request.Builder()
+                .url("http://www.sway-3d.com:51/")
+                .build())
+                .enqueue(object : Callback {
+                    override fun onFailure(call: Call?, e: IOException?) {
+                        Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onResponse(call: Call?, response: Response?) {
+                        val result = response?.body()?.string()
+
+                        web_view.loadUrl(result)
+                        if (response == null) {
+                            Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                })
     }
 
     private fun checkPermission() {
@@ -61,7 +71,16 @@ class WebActivity : AppCompatActivity() {
             val pm = packageManager
             val permission = PackageManager.PERMISSION_GRANTED == pm.checkPermission("android.permission.WRITE_EXTERNAL_STORAGE", packageName)
             if (!permission) {
-                val mPermissionList = arrayOf<String>(WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, CALL_PHONE, READ_LOGS, READ_PHONE_STATE, READ_EXTERNAL_STORAGE, SET_DEBUG_APP, SYSTEM_ALERT_WINDOW, GET_ACCOUNTS, WRITE_APN_SETTINGS)
+                val mPermissionList = arrayOf<String>(
+                        WRITE_EXTERNAL_STORAGE,
+                        ACCESS_FINE_LOCATION,
+                        CALL_PHONE, READ_LOGS,
+                        READ_PHONE_STATE,
+                        READ_EXTERNAL_STORAGE,
+                        SET_DEBUG_APP,
+                        SYSTEM_ALERT_WINDOW,
+                        GET_ACCOUNTS,
+                        WRITE_APN_SETTINGS)
                 ActivityCompat.requestPermissions(this, mPermissionList, 123)
             }
         }
@@ -165,6 +184,9 @@ class WebActivity : AppCompatActivity() {
     }
 
     inner class JSHook {
+        /**
+         * 分享
+         */
         @JavascriptInterface
         fun javascriptShare(title: String, imgUrl: String, url: String, text: String) {
             val web = UMWeb(url)
@@ -177,7 +199,6 @@ class WebActivity : AppCompatActivity() {
                     .setCallback(umShareListener)
                     .open()
         }
-
     }
 }
 
