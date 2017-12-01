@@ -14,6 +14,7 @@ import android.view.KeyEvent
 import android.webkit.*
 import android.webkit.WebSettings.LayoutAlgorithm
 import android.widget.Toast
+import com.google.gson.Gson
 import com.umeng.socialize.ShareAction
 import com.umeng.socialize.UMShareAPI
 import com.umeng.socialize.UMShareListener
@@ -38,8 +39,8 @@ class WebActivity : AppCompatActivity() {
         findView()
         settingView()
         checkPermission()
-        //loadUrl()
-        web_view.loadUrl(cfg.url)
+        loadUrl()
+//       web_view.loadUrl(cfg.url)
 
     }
 
@@ -52,16 +53,20 @@ class WebActivity : AppCompatActivity() {
                 .build())
                 .enqueue(object : Callback {
                     override fun onFailure(call: Call?, e: IOException?) {
-                        Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                        runOnUiThread {
+                            Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                     override fun onResponse(call: Call?, response: Response?) {
-                        val result = response?.body()?.string()
-
-                        web_view.loadUrl(result)
-                        if (response == null) {
-                            Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                        if (response == null || !response.isSuccessful) {
+                            runOnUiThread {
+                                Toast.makeText(this@WebActivity, resources.getString(R.string.SERVICE_ERROR), Toast.LENGTH_SHORT).show()
+                            }
                         }
+                        val result = response?.body()?.string()
+                        val urls = Gson().fromJson(result, Url::class.java)
+                        runOnUiThread { web_view.loadUrl(urls.sway3d) }
                     }
 
                 })
