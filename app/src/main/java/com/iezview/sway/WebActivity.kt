@@ -3,6 +3,7 @@ package com.iezview.sway
 import android.Manifest.permission.*
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -123,16 +124,31 @@ class WebActivity : AppCompatActivity() {
         web_view.settings.javaScriptEnabled = true
         web_view.addJavascriptInterface(JSHook(), "share")
         web_view.setWebViewClient(object : WebViewClient() {
+
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    when {
+                    //打开网页
+                        url.startsWith("http") -> view.loadUrl(url)
+                    //发邮件
+                        url.startsWith("mailto") -> mailto(url)
+                    //打电话
+                        url.startsWith("tel") -> callTo(url)
+                    }
+                }
+                return true
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     val url = request.url.toString()
                     when {
                     //打开网页
-                        url.contains("http") -> view.loadUrl(request.url.toString())
+                        url.startsWith("http") -> view.loadUrl(request.url.toString())
                     //发邮件
-                        url.contains("mailto") -> mailto(url)
+                        url.startsWith("mailto") -> mailto(url)
                     //打电话
-                        url.contains("tel") -> callTo(url)
+                        url.startsWith("tel") -> callTo(url)
                     }
                 }
                 return true
@@ -141,7 +157,7 @@ class WebActivity : AppCompatActivity() {
         web_view.setWebChromeClient(object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 if (!srl_layout.isRefreshing && newProgress != 100) {
-                    srl_layout.isRefreshing = true
+                    //    srl_layout.isRefreshing = true
                 }
                 if (newProgress == 100) {
                     srl_layout.isRefreshing = false
