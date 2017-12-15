@@ -1,53 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8">
-    <title>Untitled Document.md</title>
-    <script type="text/javascript">
-//<![CDATA[
-window.__cfRocketOptions = {byc:0,p:0,petok:"680ded67e413973bdc19f268527d5077d45cfe77-1513240139-1800"};
-//]]>
-
-
-
-
-
-
-
-    </script>
-    <script type="text/javascript"
-            src="https://ajax.cloudflare.com/cdn-cgi/scripts/9014afdb/cloudflare-static/rocket.min.js"></script>
-    <style></style>
+    <title>HTML5 GetUserMedia Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 </head>
-<body id="preview">
-<h2>
-    <a id="httpstimgsabaiducomtimgimagequality80sizeb9999_10000sec1513250109582di3a808873c6127521de7497c546b21481imgtype0srchttp3A2F2Ftcsinaimgcn2Fmaxwidth20482Ftcserviceweibocom2Fp2Fmmbiz_qpic_cn2Ff7df971e6451ae1d901f8174b3849c36jpg_1"></a>
-    <img
-            width="340" height="480"
-            src="img.jpg"
-            alt=""></h2>
-<h1><a id="_4"></a>联系方式</h1>
-<ul>
-    <li>手机：18998722445</li>
-    <li>Email：1750135020@qq.com</li>
-    <li>QQ号：1750135020</li>
-</ul>
-<hr>
-<h1><a id="_12"></a>个人信息</h1>
-<ul>
-    <li>谢彩凤/女/1996</li>
-    <li>共青团员</li>
-    <li>兴趣爱好：Android、绘画、散步、唱歌</li>
-</ul>
-<h1><a id="_17"></a>个人说明</h1>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;我是软件4班的一名学生，待人友好，为人诚实，工作勤奋，能吃苦耐劳，尽职尽责，有爱心，沉着冷静、条理清楚、立场坚定、顽强向上、乐于助人和关心他人、适应能力和幽默感、乐观和友爱。<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;学习中，我脚踏实地，求实创新。一直努力的学习专业课知识，掌握了社会科学和自然科学相结合的分析方法。了解我国对外方针政策、法规以及国际政治的理论前沿和政治学、世界经济的发展动态。为提高自己的社会交往和各方面知识的运用能力，我积极参加社会实践。这些经历，不仅增强了我吃苦耐劳、自理自立的能力，还提高了我与别人合作与交往的能力。
-    <br>
-    &nbsp;&nbsp;&nbsp;&nbsp;思想上，我积极要求上进，以党员为目标严格要求自己.我还利用课余时间深入了解各系团总支、学生分会和学生社团的日常职责及工作情况，协助各学生团体之间开展联谊活动，增进了各学生团体之间的交流。通过这些活动，不仅营造了良好的学习氛围，还丰富了校园文化，充实了新同学们的业余文化生活，还增强同学们的集体荣誉感、团队精神.
-</p>
-<hr>
+<body>
+<input type="button" title="开启摄像头" value="开启前置摄像头" onclick="getMedia(0);" /><input type="button" title="开启摄像头" value="开启后置摄像头" onclick="getMedia(1);" /><br />
+<video height="120px" autoplay="autoplay"></video><hr />
+<input type="button" title="拍照" value="拍照" onclick="getPhoto();" /><br />
+<canvas id="canvas1" height="120px" ></canvas><hr />
+<input type="button" title="视频" value="视频" onclick="getVedio();" /><br />
+<canvas id="canvas2" height="120px"></canvas>
 
-<script data-cfasync="false"
-        src="/cdn-cgi/scripts/af2821b0/cloudflare-static/email-decode.min.js"></script>
+<script type="text/javascript">
+var video = document.querySelector('video');
+var audio, audioType;
+
+var canvas1 = document.getElementById('canvas1');
+var context1 = canvas1.getContext('2d');
+
+var canvas2 = document.getElementById('canvas2');
+var context2 = canvas2.getContext('2d');
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+
+var exArray = []; //存储设备源ID
+MediaStreamTrack.getSources(function (sourceInfos) {
+for (var i = 0; i != sourceInfos.length; ++i) {
+var sourceInfo = sourceInfos[i];
+//这里会遍历audio,video，所以要加以区分
+if (sourceInfo.kind === 'video') {
+exArray.push(sourceInfo.id);
+}
+}
+});
+
+function getMedia(a) {
+if (navigator.getUserMedia) {
+navigator.getUserMedia({
+'video': {
+'optional': [{
+'sourceId': exArray[a] //0为前置摄像头，1为后置
+}]
+},
+'audio': true
+}, successFunc, errorFunc); //success是获取成功的回调函数
+}
+else {
+alert('Native device media streaming (getUserMedia) not supported in this browser.');
+}
+}
+
+function successFunc(stream) {
+//alert('Succeed to get media!');
+if (video.mozSrcObject !== undefined) {
+//Firefox中，video.mozSrcObject最初为null，而不是未定义的，我们可以靠这个来检测Firefox的支持
+video.mozSrcObject = stream;
+}
+else {
+video.src = window.URL && window.URL.createObjectURL(stream) || stream;
+}
+
+//video.play();
+
+// 音频
+audio = new Audio();
+audioType = getAudioType(audio);
+if (audioType) {
+audio.src = 'polaroid.' + audioType;
+audio.play();
+}
+}
+function errorFunc(e) {
+alert('Error！' + e);
+}
+
+
+// 将视频帧绘制到Canvas对象上,Canvas每60ms切换帧，形成肉眼视频效果
+function drawVideoAtCanvas(video, context) {
+window.setInterval(function () {
+context.drawImage(video, 0, 0, 90, 120);
+}, 60);
+}
+
+//获取音频格式
+function getAudioType(element) {
+if (element.canPlayType) {
+if (element.canPlayType('audio/mp4; codecs="mp4a.40.5"') !== '') {
+return ('aac');
+} else if (element.canPlayType('audio/ogg; codecs="vorbis"') !== '') {
+return ("ogg");
+}
+}
+return false;
+}
+
+// vedio播放时触发，绘制vedio帧图像到canvas
+// video.addEventListener('play', function () {
+// drawVideoAtCanvas(video, context2);
+// }, false);
+
+//拍照
+function getPhoto() {
+context1.drawImage(video, 0, 0, 90, 120); //将video对象内指定的区域捕捉绘制到画布上指定的区域，实现拍照。
+}
+
+//视频
+function getVedio() {
+drawVideoAtCanvas(video, context2);
+}
+
+</script>
 </body>
 </html>
