@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sway</string>
+    <string name="app_name">维观</string>
     <string name="welcome">welcome</string>
     <string name="SERVICE_ERROR">服务器异常！</string>
 </resources>

@@ -40,8 +40,8 @@ class WebActivity : AppCompatActivity() {
         findView()
         settingView()
         checkPermission()
-        //   loadUrl()
-        web_view.loadUrl(cfg.url)
+           loadUrl()
+//        web_view.loadUrl(cfg.url)
 
     }
 
