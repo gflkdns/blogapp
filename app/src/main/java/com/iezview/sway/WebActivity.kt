@@ -40,8 +40,8 @@ class WebActivity : AppCompatActivity() {
         findView()
         settingView()
         checkPermission()
-           loadUrl()
-//        web_view.loadUrl(cfg.url)
+        //  loadUrl()
+        web_view.loadUrl(cfg.url)
 
     }
 
@@ -123,34 +123,28 @@ class WebActivity : AppCompatActivity() {
         web_view.settings.loadWithOverviewMode = true
         web_view.settings.javaScriptEnabled = true
         web_view.addJavascriptInterface(JSHook(), "share")
+        web_view.setDownloadListener { url,
+                                       userAgent,
+                                       contentDisposition,
+                                       mimetype,
+                                       contentLength
+            ->
+            downloadTo(url)
+        }
         web_view.setWebViewClient(object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    when {
-                    //打开网页
-                        url.startsWith("http") -> view.loadUrl(url)
-                    //发邮件
-                        url.startsWith("mailto") -> mailto(url)
-                    //打电话
-                        url.startsWith("tel") -> callTo(url)
-                    }
-                }
+                urlTranslate(url, view)
                 return true
             }
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    val url = request.url.toString()
-                    when {
-                    //打开网页
-                        url.startsWith("http") -> view.loadUrl(request.url.toString())
-                    //发邮件
-                        url.startsWith("mailto") -> mailto(url)
-                    //打电话
-                        url.startsWith("tel") -> callTo(url)
-                    }
+                val url = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    request.url.toString()
+                } else {
+                    TODO("VERSION.SDK_INT < LOLLIPOP")
                 }
+                urlTranslate(url, view)
                 return true
             }
         })
@@ -165,6 +159,26 @@ class WebActivity : AppCompatActivity() {
                 super.onProgressChanged(view, newProgress)
             }
         })
+    }
+
+    private fun urlTranslate(url: String, view: WebView) {
+        when {
+        //打开网页
+            url.startsWith("http") -> view.loadUrl(url)
+        //发邮件
+            url.startsWith("mailto") -> mailto(url)
+        //打电话
+            url.startsWith("tel") -> callTo(url)
+//        //打开浏览器下载
+//            url.startsWith("download¥") -> downloadTo(url)
+        }
+    }
+
+    private fun downloadTo(url: String) {
+        val intent = Intent()
+        intent.action = "android.intent.action.VIEW"
+        intent.data = Uri.parse(url)
+        startActivity(intent)
     }
 
     private fun findView() {
