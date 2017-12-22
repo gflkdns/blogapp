@@ -41,12 +41,12 @@ class WebActivity : AppCompatActivity() {
         settingView()
         checkPermission()
         loadUrl()
-        // web_view.loadUrl(cfg.url)
+        //  web_view.loadUrl("http://192.168.1.137:8081/web")
 
     }
 
     /**
-     * 访问服务器获取根路径并加载网页
+     * 访问服务器获取根路径并加载网页7
      */
     private fun loadUrl() {
         OkHttpClient().newCall(Request.Builder()
@@ -169,8 +169,6 @@ class WebActivity : AppCompatActivity() {
             url.startsWith("mailto") -> mailto(url)
         //打电话
             url.startsWith("tel") -> callTo(url)
-//        //打开浏览器下载
-//            url.startsWith("download¥") -> downloadTo(url)
         }
     }
 
@@ -234,6 +232,14 @@ class WebActivity : AppCompatActivity() {
                     .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
                     .setCallback(umShareListener)
                     .open()
+        }
+
+        @JavascriptInterface
+        fun openThirdpartyURL(url: String) {
+            val intent = Intent()
+            intent.action = "android.intent.action.VIEW"
+            intent.data = Uri.parse(url)
+            startActivity(intent)
         }
 
         @JavascriptInterface
