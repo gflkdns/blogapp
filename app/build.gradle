@@ -7,9 +7,9 @@ android {
     defaultConfig {
         applicationId "com.iezview.sway"
         minSdkVersion 17
-        targetSdkVersion 25
-        versionCode 200000
-        versionName "2.0"
+        targetSdkVersion 26
+        versionCode 200001
+        versionName "2.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -67,7 +67,7 @@ class WebActivity : AppCompatActivity() {
                         }
                         val result = response?.body()?.string()
                         val urls = Gson().fromJson(result, Url::class.java)
-                        runOnUiThread { web_view.loadUrl(urls.dev_sway3d) }
+                        runOnUiThread { web_view.loadUrl(urls.sway3d) }
                     }
 
                 })
