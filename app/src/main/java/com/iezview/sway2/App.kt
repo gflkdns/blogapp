@@ -1,4 +1,4 @@
-package com.iezview.sway
+package com.iezview.sway2
 
 import android.app.Application
 import android.webkit.JavascriptInterface
@@ -17,7 +17,7 @@ class App : Application() {
         super.onCreate()
         UMShareAPI.get(this)
         PlatformConfig.setWeixin("wxce5512ac15a03044", "83e9fe5d49145027dfc3d2692b36fe40")
-        PlatformConfig.setQQZone("1105443967", "xS04nuVhKWdW1tL1")
+        PlatformConfig.setQQZone("1106558171", "8M1C4HEbyHAVQtvV")
         PlatformConfig.setSinaWeibo("3921700954", "04b48b094faeb16683c32669824ebdad", "http://sns.whalecloud.com")
         Config.DEBUG = true
     }

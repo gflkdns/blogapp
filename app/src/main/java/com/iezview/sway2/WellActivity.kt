@@ -1,4 +1,4 @@
-package com.iezview.sway
+package com.iezview.sway2
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity

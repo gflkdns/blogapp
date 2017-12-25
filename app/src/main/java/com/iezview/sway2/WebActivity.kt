@@ -1,9 +1,8 @@
-package com.iezview.sway
+package com.iezview.sway2
 
 import android.Manifest.permission.*
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -229,7 +228,7 @@ class WebActivity : AppCompatActivity() {
             web.description = text
             ShareAction(this@WebActivity)
                     .withMedia(web)
-                    .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
+                    .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE)
                     .setCallback(umShareListener)
                     .open()
         }

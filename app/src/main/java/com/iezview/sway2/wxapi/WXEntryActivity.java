@@ -1,4 +1,4 @@
-package com.iezview.sway.wxapi;
+package com.iezview.sway2.wxapi;
 
 
 import com.umeng.weixin.callback.WXCallbackActivity;
