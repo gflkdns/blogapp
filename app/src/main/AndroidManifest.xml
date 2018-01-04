@@ -23,7 +23,9 @@
             android:name="UMENG_APPKEY"
             android:value="5a1e6294f29d98307c000213" />
 
-        <activity android:name=".WellActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".WellActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -61,7 +63,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="tencent1105443967" />
+                <data android:scheme="tencent1106558171" />
             </intent-filter>
         </activity>
         <activity
@@ -69,7 +71,9 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".WebActivity" android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".WebActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

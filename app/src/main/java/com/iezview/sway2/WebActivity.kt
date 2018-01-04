@@ -97,12 +97,6 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-
-    }
-
-
     private fun settingView() {
         settingRefview()
         settingWebView()
@@ -116,10 +110,10 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
-        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data)
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+////        super.onActivityResult(requestCode, resultCode, data)
+////        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data)
+//    }
 
     private fun settingWebView() {
         web_view.settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
@@ -199,6 +193,8 @@ class WebActivity : AppCompatActivity() {
         startActivity(data)
     }
 
+    private var lasttime: Long = 0
+
     /**
      * 监听手机按键
      */
@@ -208,7 +204,12 @@ class WebActivity : AppCompatActivity() {
             web_view.goBack()
             return true
         }
-        return super.onKeyDown(keyCode, event)
+        if (System.currentTimeMillis() - lasttime < 2000) {
+            return super.onKeyDown(keyCode, event)
+        }
+        Toast.makeText(this, "再按一次退出${resources.getString(R.string.app_name)}", Toast.LENGTH_LONG).show()
+        lasttime = System.currentTimeMillis()
+        return true
     }
 
     inner class JSHook {
@@ -224,7 +225,7 @@ class WebActivity : AppCompatActivity() {
             ShareAction(this@WebActivity)
                     .withMedia(web)
                     .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
-                    .setCallback(umShareListener)
+                    .setCallback(umShareListener())
                     .open()
         }
 
@@ -239,20 +240,23 @@ class WebActivity : AppCompatActivity() {
         @JavascriptInterface
         fun isSwayApp(): Boolean = true
     }
+
+    inner class umShareListener : UMShareListener {
+        override fun onResult(p0: SHARE_MEDIA?) {
+        }
+
+        override fun onCancel(p0: SHARE_MEDIA?) {
+            Toast.makeText(this@WebActivity, "分享被取消！", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onError(p0: SHARE_MEDIA?, p1: Throwable) {
+            Toast.makeText(this@WebActivity, "分享失败！请您检查对应平台是否安装或您的网络是否正常！", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onStart(p0: SHARE_MEDIA?) {
+        }
+
+    }
+
 }
 
-
-object umShareListener : UMShareListener {
-    override fun onResult(p0: SHARE_MEDIA?) {
-    }
-
-    override fun onCancel(p0: SHARE_MEDIA?) {
-    }
-
-    override fun onError(p0: SHARE_MEDIA?, p1: Throwable?) {
-    }
-
-    override fun onStart(p0: SHARE_MEDIA?) {
-    }
-
-}
