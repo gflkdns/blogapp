@@ -11,10 +11,13 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
-import android.webkit.*
-import android.webkit.WebSettings.LayoutAlgorithm
+import android.webkit.JavascriptInterface
+import com.tencent.smtt.sdk.WebView
 import android.widget.Toast
 import com.google.gson.Gson
+import com.tencent.smtt.sdk.WebChromeClient
+import com.tencent.smtt.sdk.WebSettings
+import com.tencent.smtt.sdk.WebViewClient
 import com.umeng.socialize.ShareAction
 import com.umeng.socialize.UMShareAPI
 import com.umeng.socialize.UMShareListener
@@ -40,7 +43,7 @@ class WebActivity : AppCompatActivity() {
         settingView()
         checkPermission()
         loadUrl()
-        //  web_view.loadUrl("http://192.168.1.137:8081/web")
+        // web_view.loadUrl("https://www.baidu.com/")
 
     }
 
@@ -66,7 +69,9 @@ class WebActivity : AppCompatActivity() {
                         }
                         val result = response?.body()?.string()
                         val urls = Gson().fromJson(result, Url::class.java)
-                        runOnUiThread { web_view.loadUrl(urls.sway3d) }
+                        runOnUiThread {
+                            web_view.loadUrl(urls.sway3d)
+                        }
                     }
 
                 })
@@ -117,7 +122,7 @@ class WebActivity : AppCompatActivity() {
     }
 
     private fun settingWebView() {
-        web_view.settings.layoutAlgorithm = LayoutAlgorithm.SINGLE_COLUMN
+        web_view.settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
         web_view.settings.useWideViewPort = true
         web_view.settings.loadWithOverviewMode = true
         web_view.settings.javaScriptEnabled = true
@@ -133,16 +138,6 @@ class WebActivity : AppCompatActivity() {
         web_view.setWebViewClient(object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                urlTranslate(url, view)
-                return true
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                val url = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    request.url.toString()
-                } else {
-                    TODO("VERSION.SDK_INT < LOLLIPOP")
-                }
                 urlTranslate(url, view)
                 return true
             }
@@ -228,7 +223,7 @@ class WebActivity : AppCompatActivity() {
             web.description = text
             ShareAction(this@WebActivity)
                     .withMedia(web)
-                    .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE)
+                    .setDisplayList(SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE)
                     .setCallback(umShareListener)
                     .open()
         }
