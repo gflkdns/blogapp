@@ -70,7 +70,7 @@ class WebActivity : AppCompatActivity() {
                         val result = response?.body()?.string()
                         val urls = Gson().fromJson(result, Url::class.java)
                         runOnUiThread {
-                            web_view.loadUrl(urls.sway3d)
+                            web_view.loadUrl(urls.dev_sway3d)
                         }
                     }
 
@@ -204,12 +204,15 @@ class WebActivity : AppCompatActivity() {
             web_view.goBack()
             return true
         }
-        if (System.currentTimeMillis() - lasttime < 2000) {
-            return super.onKeyDown(keyCode, event)
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (System.currentTimeMillis() - lasttime < 2000) {
+                return super.onKeyDown(keyCode, event)
+            }
+            Toast.makeText(this, "再按一次退出${resources.getString(R.string.app_name)}", Toast.LENGTH_LONG).show()
+            lasttime = System.currentTimeMillis()
+            return true
         }
-        Toast.makeText(this, "再按一次退出${resources.getString(R.string.app_name)}", Toast.LENGTH_LONG).show()
-        lasttime = System.currentTimeMillis()
-        return true
+        return super.onKeyDown(keyCode, event)
     }
 
     inner class JSHook {
