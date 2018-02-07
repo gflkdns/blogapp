@@ -7,10 +7,12 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
+import android.view.View
 import android.webkit.JavascriptInterface
 import com.tencent.smtt.sdk.WebView
 import android.widget.Toast
@@ -43,8 +45,10 @@ class WebActivity : AppCompatActivity() {
         settingView()
         checkPermission()
         loadUrl()
-        // web_view.loadUrl("https://www.baidu.com/")
-
+        // web_view.loadUrl("http://192.168.1.188:81/web/")
+        Handler().postDelayed({
+            findViewById(R.id.wellcome).visibility = View.GONE
+        }, 3000)
     }
 
     /**
@@ -70,7 +74,7 @@ class WebActivity : AppCompatActivity() {
                         val result = response?.body()?.string()
                         val urls = Gson().fromJson(result, Url::class.java)
                         runOnUiThread {
-                            web_view.loadUrl(urls.dev_sway3d)
+                            web_view.loadUrl(urls.sway3d)
                         }
                     }
 
