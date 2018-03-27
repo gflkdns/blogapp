@@ -249,8 +249,7 @@ class WebActivity : AppCompatActivity() {
     }
 
     inner class umShareListener : UMShareListener {
-        override fun onResult(p0: SHARE_MEDIA?) {
-        }
+        override fun onResult(p0: SHARE_MEDIA?) = Unit
 
         override fun onCancel(p0: SHARE_MEDIA?) {
             Toast.makeText(this@WebActivity, "分享被取消！", Toast.LENGTH_SHORT).show()
@@ -260,8 +259,7 @@ class WebActivity : AppCompatActivity() {
             Toast.makeText(this@WebActivity, "分享失败！请您检查对应平台是否安装或您的网络是否正常！", Toast.LENGTH_SHORT).show()
         }
 
-        override fun onStart(p0: SHARE_MEDIA?) {
-        }
+        override fun onStart(p0: SHARE_MEDIA?) = Unit
 
     }
 
