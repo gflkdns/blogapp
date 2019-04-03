@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sway_web.iml" filepath="$PROJECT_DIR$/sway_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/blogapp.iml" filepath="$PROJECT_DIR$/blogapp.iml" />
+      <module fileurl="file://F:\blogapp\sway_web.iml" filepath="F:\blogapp\sway_web.iml" />
     </modules>
   </component>
 </project>
