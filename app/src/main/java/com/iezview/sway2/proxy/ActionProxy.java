@@ -7,14 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.blankj.utilcode.util.ToastUtils;
-import com.iezview.sway2.ActionModel;
+import com.iezview.sway2.model.ActionModel;
 import com.iezview.sway2.R;
 import com.iezview.sway2.adapter.TAdapter;
 import com.iezview.sway2.adapter.houlder.ActionHolder;

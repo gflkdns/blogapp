@@ -1,4 +1,4 @@
-package com.iezview.sway2;
+package com.iezview.sway2.model;
 
 import com.iezview.sway2.bean.Action;
 

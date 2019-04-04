@@ -7,6 +7,9 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,8 +24,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import com.iezview.sway2.R;
+import com.iezview.sway2.adapter.TAdapter;
+import com.iezview.sway2.adapter.houlder.ParserHoulder;
+import com.iezview.sway2.adapter.houlder.THolder;
+import com.iezview.sway2.model.ParserModel;
 import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
 
@@ -42,6 +50,9 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
     private View customView;
     private FrameLayout fullscreenContainer;
     private WebChromeClient.CustomViewCallback customViewCallback;
+    private RecyclerView lv_parsers;
+    private TAdapter<THolder> parserAdapter;
+    private DrawerLayout dl_layout;
 
     public WebVideoPlayerActyProxy(ProxyActivity acty) {
         super(acty);
@@ -52,6 +63,15 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
         url = mActy.getIntent().getStringExtra("url");//传进来视频链接
         mActy.setContentView(R.layout.activity_web);
         webView = (WebView) mActy.findViewById(R.id.webview);
+        lv_parsers = mActy.findViewById(R.id.lv_parsers);
+        dl_layout = mActy.findViewById(R.id.dl_layout);
+        dl_layout.setDrawerLockMode(mActy.getIntent().getBooleanExtra("showMenu", false) ?
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
+        lv_parsers.setLayoutManager(new LinearLayoutManager(mActy));
+        ParserModel model = new ParserModel();
+        model.setTargetUrl(url);
+        parserAdapter = new TAdapter<>(model.getCfgs(), mActy, R.layout.item_parser, ParserHoulder.class);
+        lv_parsers.setAdapter(parserAdapter);
         initWebView();
     }
 
@@ -190,6 +210,7 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
         mActy.getWindow().setFlags(flag, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
+    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
@@ -203,7 +224,7 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
                 }
                 return true;
             default:
-                return super.mActy.onKeyUp(keyCode, event);
+                return false;
         }
     }
 

@@ -14,9 +14,10 @@ class ActionActivity : ProxyActivity()
 @BindProxy(clazz = WebVideoPlayerActyProxy::class, level = ParentalEntrustmentLevel.PROJECT)
 class WebVideoPlayerActy : ProxyActivity() {
     companion object {
-        fun start(url: String) {
+        fun start(url: String, showMenu: Boolean?) {
             val intent = Intent(ActivityUtils.getTopActivity(), WebVideoPlayerActy::class.java);
             intent.putExtra("url", url)
+            intent.putExtra("showMenu", showMenu)
             ActivityUtils.startActivity(intent)
         }
     }
