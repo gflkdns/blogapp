@@ -25,7 +25,7 @@ import java.util.List;
  * Created by t54 on 2019/4/3.
  */
 @AddToFixPatch
-public class ActionProxy extends ActivityProxy implements SwipeRefreshLayout.OnRefreshListener {
+public class ActionProxy extends BaseProxy implements SwipeRefreshLayout.OnRefreshListener {
     RecyclerView rv_list;
     SwipeRefreshLayout ref_layout;
     private List<Action> data;

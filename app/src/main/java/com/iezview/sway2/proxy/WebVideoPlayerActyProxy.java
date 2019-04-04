@@ -34,11 +34,14 @@ import com.iezview.sway2.model.ParserModel;
 import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by t54 on 2019/4/4.
  */
 
-public class WebVideoPlayerActyProxy extends ActivityProxy {
+public class WebVideoPlayerActyProxy extends BaseProxy {
 
     private WebView webView;
     private String url;
@@ -53,6 +56,8 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
     private RecyclerView lv_parsers;
     private TAdapter<THolder> parserAdapter;
     private DrawerLayout dl_layout;
+    private ParserModel model;
+    private List data;
 
     public WebVideoPlayerActyProxy(ProxyActivity acty) {
         super(acty);
@@ -60,17 +65,19 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
 
     @Override
     public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         url = mActy.getIntent().getStringExtra("url");//传进来视频链接
         mActy.setContentView(R.layout.activity_web);
         webView = (WebView) mActy.findViewById(R.id.webview);
+        showProgressDialog("加载中...");
         lv_parsers = mActy.findViewById(R.id.lv_parsers);
         dl_layout = mActy.findViewById(R.id.dl_layout);
         dl_layout.setDrawerLockMode(mActy.getIntent().getBooleanExtra("showMenu", false) ?
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
         lv_parsers.setLayoutManager(new LinearLayoutManager(mActy));
-        ParserModel model = new ParserModel();
-        model.setTargetUrl(url);
-        parserAdapter = new TAdapter<>(model.getCfgs(), mActy, R.layout.item_parser, ParserHoulder.class);
+        model = new ParserModel();
+        data = new ArrayList();
+        parserAdapter = new TAdapter<>(data, mActy, R.layout.item_parser, ParserHoulder.class);
         lv_parsers.setAdapter(parserAdapter);
         initWebView();
     }
@@ -119,7 +126,15 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 webView.loadUrl(url);
+                showProgressDialog("加载中...");
                 return true;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                dismissProgressDialog();
+                refMenu(url);
             }
         };
         webView.setWebViewClient(wvc);
@@ -148,6 +163,13 @@ public class WebVideoPlayerActyProxy extends ActivityProxy {
             }
         });
         webView.loadUrl(url);
+    }
+
+    private void refMenu(String url) {
+        data.clear();
+        model.setTargetUrl(url);
+        data.addAll(model.getCfgs());
+        parserAdapter.notifyDataSetChanged();
     }
 
     /**
