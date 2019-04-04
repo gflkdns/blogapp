@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -26,10 +27,13 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.iezview.sway2.R;
 import com.iezview.sway2.adapter.TAdapter;
 import com.iezview.sway2.adapter.houlder.ParserHoulder;
 import com.iezview.sway2.adapter.houlder.THolder;
+import com.iezview.sway2.bean.Action;
+import com.iezview.sway2.bean.ParserCfg;
 import com.iezview.sway2.model.ParserModel;
 import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
@@ -37,11 +41,15 @@ import com.miqt.wand.activity.ProxyActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+
 /**
  * Created by t54 on 2019/4/4.
  */
 
-public class WebVideoPlayerActyProxy extends BaseProxy {
+public class WebVideoPlayerActyProxy extends BaseProxy implements SwipeRefreshLayout.OnRefreshListener {
 
     private WebView webView;
     private String url;
@@ -56,8 +64,8 @@ public class WebVideoPlayerActyProxy extends BaseProxy {
     private RecyclerView lv_parsers;
     private TAdapter<THolder> parserAdapter;
     private DrawerLayout dl_layout;
-    private ParserModel model;
-    private List data;
+    private List<ParserCfg> data;
+    private SwipeRefreshLayout srl_layout;
 
     public WebVideoPlayerActyProxy(ProxyActivity acty) {
         super(acty);
@@ -69,17 +77,36 @@ public class WebVideoPlayerActyProxy extends BaseProxy {
         url = mActy.getIntent().getStringExtra("url");//传进来视频链接
         mActy.setContentView(R.layout.activity_web);
         webView = (WebView) mActy.findViewById(R.id.webview);
+        srl_layout = (SwipeRefreshLayout) mActy.findViewById(R.id.srl_layout);
+        srl_layout.setOnRefreshListener(this);
         showProgressDialog("加载中...");
         lv_parsers = mActy.findViewById(R.id.lv_parsers);
         dl_layout = mActy.findViewById(R.id.dl_layout);
         dl_layout.setDrawerLockMode(mActy.getIntent().getBooleanExtra("showMenu", false) ?
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
         lv_parsers.setLayoutManager(new LinearLayoutManager(mActy));
-        model = new ParserModel();
         data = new ArrayList();
         parserAdapter = new TAdapter<>(data, mActy, R.layout.item_parser, ParserHoulder.class);
         lv_parsers.setAdapter(parserAdapter);
         initWebView();
+        getdata();
+    }
+
+    private void getdata() {
+        BmobQuery<ParserCfg> query = new BmobQuery<>();
+        query
+                .findObjects(new FindListener<ParserCfg>() {
+                    @Override
+                    public void done(List<ParserCfg> object, BmobException e) {
+                        if (e == null) {
+                            data.clear();
+                            data.addAll(object);
+                            parserAdapter.notifyDataSetChanged();
+                        } else {
+                            ToastUtils.showShort("获取解析器失败：" + e.getMessage());
+                        }
+                    }
+                });
     }
 
     @Override
@@ -165,11 +192,10 @@ public class WebVideoPlayerActyProxy extends BaseProxy {
         webView.loadUrl(url);
     }
 
-    private void refMenu(String url) {
-        data.clear();
-        model.setTargetUrl(url);
-        data.addAll(model.getCfgs());
-        parserAdapter.notifyDataSetChanged();
+    private void refMenu(final String url) {
+        for (int i = 0; i < data.size(); i++) {
+            data.get(i).setTargetUrl(webView.getUrl());
+        }
     }
 
     /**
@@ -209,6 +235,13 @@ public class WebVideoPlayerActyProxy extends BaseProxy {
         customView = null;
         customViewCallback.onCustomViewHidden();
         webView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onRefresh() {
+        webView.loadUrl(webView.getUrl());
+        refMenu(webView.getUrl());
+        srl_layout.setRefreshing(false);
     }
 
     /**

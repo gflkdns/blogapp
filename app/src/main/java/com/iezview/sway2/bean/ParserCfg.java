@@ -1,19 +1,15 @@
 package com.iezview.sway2.bean;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  * Created by t54 on 2019/4/4.
  */
 
-public class ParserCfg {
+public class ParserCfg extends BmobObject {
     String url;
     String targetUrl;
     String name;
-
-    public ParserCfg(String url, String targetUrl, String name) {
-        this.url = url;
-        this.targetUrl = targetUrl;
-        this.name = name;
-    }
 
     public String getTargetUrl() {
         return targetUrl;

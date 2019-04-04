@@ -1,13 +1,14 @@
 package com.iezview.sway2.bean;
 
 
-import com.avos.avoscloud.AVObject;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobObject;
 
 /**
  * Created by t54 on 2019/4/3.
  */
 
-public class Action extends AVObject {
+public class Action extends BmobObject {
     String name;
     String url;
     String image;

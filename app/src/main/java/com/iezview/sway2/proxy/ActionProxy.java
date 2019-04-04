@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.iezview.sway2.model.ActionModel;
 import com.iezview.sway2.R;
 import com.iezview.sway2.adapter.TAdapter;
@@ -19,6 +20,10 @@ import com.miqt.wand.anno.AddToFixPatch;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 
 
 /**
@@ -94,12 +99,24 @@ public class ActionProxy extends BaseProxy implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
         getData();
+        ref_layout.setRefreshing(false);
     }
 
     private void getData() {
-        ActionModel model = new ActionModel();
-        data.clear();
-        data.addAll(model.getActions());
-        adapter.notifyDataSetChanged();
+        BmobQuery<Action> query = new BmobQuery<>();
+        query
+                .findObjects(new FindListener<Action>() {
+                    @Override
+                    public void done(List<Action> object, BmobException e) {
+                        if (e == null) {
+                            data.clear();
+                            data.addAll(object);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            ToastUtils.showShort("获取平台信息失败：" + e.getMessage());
+                        }
+                    }
+                });
+
     }
 }
