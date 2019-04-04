@@ -2,4 +2,6 @@
     <string name="app_name">Sway</string>
     <string name="welcome">welcome</string>
     <string name="SERVICE_ERROR">服务器异常！</string>
+    <string name="mail_subject">来自</string>
+    <string name="mail_text">hello</string>
 </resources>

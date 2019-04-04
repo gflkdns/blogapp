@@ -1,11 +1,15 @@
 package com.iezview.sway2
 
 import android.app.Application
+import android.util.Log
 import android.webkit.JavascriptInterface
+import com.avos.avoscloud.AVOSCloud
+import com.blankj.utilcode.util.Utils
+import com.miqt.wand.Wand
+import com.avos.avoscloud.AVException
+import com.avos.avoscloud.AVObject
+import com.avos.avoscloud.SaveCallback
 
-import com.umeng.socialize.Config
-import com.umeng.socialize.PlatformConfig
-import com.umeng.socialize.UMShareAPI
 
 /**
  * Created by Administrator on 2017/11/29.
@@ -15,10 +19,20 @@ class App : Application() {
     @JavascriptInterface
     override fun onCreate() {
         super.onCreate()
-        UMShareAPI.get(this)
-        PlatformConfig.setWeixin("wxce5512ac15a03044", "83e9fe5d49145027dfc3d2692b36fe40")
-        PlatformConfig.setQQZone("1106558171", "8M1C4HEbyHAVQtvV")
-        PlatformConfig.setSinaWeibo("3921700954", "04b48b094faeb16683c32669824ebdad", "http://sns.whalecloud.com")
-        Config.DEBUG = true
+        Utils.init(this)
+        Wand.get().init(this)
+        // 初始化参数依次为 this, AppId, AppKey
+        AVOSCloud.initialize(this,"DMkb08sHKI9ewtfWndD1Cj4n-gzGzoHsz","A97QWxdf01FUL0e4inBFCKRg");
+        AVOSCloud.setDebugLogEnabled(true);
+        // 测试 SDK 是否正常工作的代码
+        val testObject = AVObject("TestObject")
+        testObject.put("words", "Hello World!")
+        testObject.saveInBackground(object : SaveCallback() {
+            override fun done(e: AVException?) {
+                if (e == null) {
+                    Log.d("saved", "success!")
+                }
+            }
+        })
     }
 }

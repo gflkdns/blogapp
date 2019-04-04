@@ -7,6 +7,9 @@ buildscript {
         google()
         jcenter()
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
+        maven {
+            url "http://mvn.leancloud.cn/nexus/content/repositories/public"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -24,6 +27,9 @@ allprojects {
         google()
         jcenter()
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
+        maven {
+            url "http://mvn.leancloud.cn/nexus/content/repositories/public"
+        }
     }
 }
 
