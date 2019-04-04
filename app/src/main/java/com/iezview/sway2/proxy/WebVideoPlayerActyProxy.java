@@ -37,6 +37,7 @@ import com.iezview.sway2.bean.ParserCfg;
 import com.iezview.sway2.model.ParserModel;
 import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
+import com.miqt.wand.anno.AddToFixPatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by t54 on 2019/4/4.
  */
-
+@AddToFixPatch
 public class WebVideoPlayerActyProxy extends BaseProxy implements SwipeRefreshLayout.OnRefreshListener {
 
     private WebView webView;
@@ -94,7 +95,7 @@ public class WebVideoPlayerActyProxy extends BaseProxy implements SwipeRefreshLa
 
     private void getdata() {
         BmobQuery<ParserCfg> query = new BmobQuery<>();
-        query
+        query.order("-createdAt")
                 .findObjects(new FindListener<ParserCfg>() {
                     @Override
                     public void done(List<ParserCfg> object, BmobException e) {

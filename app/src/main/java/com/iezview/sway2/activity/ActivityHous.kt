@@ -8,10 +8,10 @@ import com.miqt.wand.activity.ProxyActivity
 import com.miqt.wand.anno.BindProxy
 import com.miqt.wand.anno.ParentalEntrustmentLevel
 
-@BindProxy(clazz = ActionProxy::class, level = ParentalEntrustmentLevel.PROJECT)
+@BindProxy(clazz = ActionProxy::class, level = ParentalEntrustmentLevel.NEVER)
 class ActionActivity : ProxyActivity()
 
-@BindProxy(clazz = WebVideoPlayerActyProxy::class, level = ParentalEntrustmentLevel.PROJECT)
+@BindProxy(clazz = WebVideoPlayerActyProxy::class, level = ParentalEntrustmentLevel.NEVER)
 class WebVideoPlayerActy : ProxyActivity() {
     companion object {
         fun start(url: String, showMenu: Boolean?) {

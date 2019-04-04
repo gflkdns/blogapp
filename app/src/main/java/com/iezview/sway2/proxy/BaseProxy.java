@@ -6,11 +6,12 @@ import android.support.annotation.Nullable;
 
 import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
+import com.miqt.wand.anno.AddToFixPatch;
 
 /**
  * Created by t54 on 2019/4/4.
  */
-
+@AddToFixPatch
 public class BaseProxy extends ActivityProxy {
     private ProgressDialog dialog;
 
