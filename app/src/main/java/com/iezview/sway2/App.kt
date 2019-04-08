@@ -30,16 +30,18 @@ class App : Application() {
         Bmob.initialize(this, "9de701ecbdf29f956d2d0a951cf9d66d");
 
         val query = BmobQuery<HotFix>()
-        query.setLimit(1).order("-createdAt")
+        query.setLimit(1).order("-versionCode")
                 .findObjects(object : FindListener<HotFix>() {
                     override fun done(`object`: List<HotFix>, e: BmobException?) {
                         if (`object`.size > 0 && e == null) {
                             val fix = `object`.get(0)
-                            if (fix.versionCode > SPUtils.getInstance().getInt("wand_last_file", -1)) {
+                            val cv=SPUtils.getInstance().getInt("wand_last_file", -1)
+                            Log.d("wandfix", "current dex version:"+cv)
+                            if (fix.versionCode > cv) {
                                 downloadAndTouch(fix)
                             }
                         } else {
-                           Log.d("wandfix","\"更新失败：${e?.message}\"")
+                            Log.d("wandfix", "\"更新失败：${e?.message}\"")
                         }
                     }
                 })

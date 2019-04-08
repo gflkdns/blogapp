@@ -1,5 +1,7 @@
 package com.iezview.sway2.proxy;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.iezview.sway2.model.ActionModel;
 import com.iezview.sway2.R;
@@ -54,6 +57,33 @@ public class ActionProxy extends BaseProxy implements SwipeRefreshLayout.OnRefre
         ref_layout.setOnRefreshListener(this);
 
         getData();
+
+        showTS();
+    }
+
+    private void showTS() {
+        if (!SPUtils.getInstance().getBoolean("isShowTS", true)) {
+            return;
+        }
+        new AlertDialog.Builder(mActy)
+                .setTitle("使用方法")
+                .setMessage(
+                        "1. 打开一个视频平台。\n" +
+                                "2. 打开想要观看的视频页面等待加载完成。\n" +
+                                "3. 屏幕向右滑出侧边栏，选择线路耐心等待一会解析加载结束播放就可以了。不同线路可能对平台的支持性不同，如果资源无法播放，可以多尝试其它的线路。\n" +
+                                "注意：app线路配置需要网络获取，因此请保持手机网络畅通。"
+                )
+                .setNegativeButton("不在提示", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SPUtils.getInstance().put("isShowTS", false);
+                    }
+                }).setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }).create().show();
     }
 
     @Override
@@ -104,19 +134,19 @@ public class ActionProxy extends BaseProxy implements SwipeRefreshLayout.OnRefre
 
     private void getData() {
         BmobQuery<Action> query = new BmobQuery<>();
-        query
-                .findObjects(new FindListener<Action>() {
-                    @Override
-                    public void done(List<Action> object, BmobException e) {
-                        if (e == null) {
-                            data.clear();
-                            data.addAll(object);
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            ToastUtils.showShort("获取平台信息失败：" + e.getMessage());
-                        }
-                    }
-                });
+        query.findObjects(new ActionFindListener());
+    }
 
+    public class ActionFindListener extends FindListener<Action> {
+        @Override
+        public void done(List<Action> object, BmobException e) {
+            if (e == null) {
+                data.clear();
+                data.addAll(object);
+                adapter.notifyDataSetChanged();
+            } else {
+                ToastUtils.showShort("获取平台信息失败：" + e.getMessage());
+            }
+        }
     }
 }

@@ -25,17 +25,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.iezview.sway2.R;
 import com.iezview.sway2.adapter.TAdapter;
 import com.iezview.sway2.adapter.houlder.ParserHoulder;
 import com.iezview.sway2.adapter.houlder.THolder;
-import com.iezview.sway2.bean.Action;
 import com.iezview.sway2.bean.ParserCfg;
-import com.iezview.sway2.model.ParserModel;
-import com.miqt.wand.activity.ActivityProxy;
 import com.miqt.wand.activity.ProxyActivity;
 import com.miqt.wand.anno.AddToFixPatch;
 
@@ -150,52 +146,55 @@ public class WebVideoPlayerActyProxy extends BaseProxy implements SwipeRefreshLa
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE); // 不加载缓存内容
 
         webView.setWebChromeClient(wvcc);
-        WebViewClient wvc = new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                webView.loadUrl(url);
-                showProgressDialog("加载中...");
-                return true;
-            }
+        webView.setWebViewClient(new MyWebClient());
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                dismissProgressDialog();
-                refMenu(url);
-            }
-        };
-        webView.setWebViewClient(wvc);
-
-        webView.setWebChromeClient(new WebChromeClient() {
-            /*** 视频播放相关的方法 **/
-
-            @Override
-            public View getVideoLoadingProgressView() {
-                FrameLayout frameLayout = new FrameLayout(mActy);
-                frameLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-                return frameLayout;
-            }
-
-            @Override
-            public void onShowCustomView(View view, CustomViewCallback callback) {
-                showCustomView(view, callback);
-                mActy.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);//播放时横屏幕，如果需要改变横竖屏，只需该参数就行了
-
-            }
-
-            @Override
-            public void onHideCustomView() {
-                hideCustomView();
-                mActy.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//不播放时竖屏
-            }
-        });
+        webView.setWebChromeClient(new MyWebChromeClient());
         webView.loadUrl(url);
+    }
+
+    public class MyWebChromeClient extends WebChromeClient {
+        /*** 视频播放相关的方法 **/
+
+        @Override
+        public View getVideoLoadingProgressView() {
+            FrameLayout frameLayout = new FrameLayout(mActy);
+            frameLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            return frameLayout;
+        }
+
+        @Override
+        public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
+            showCustomView(view, callback);
+            mActy.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);//播放时横屏幕，如果需要改变横竖屏，只需该参数就行了
+
+        }
+
+        @Override
+        public void onHideCustomView() {
+            hideCustomView();
+            mActy.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//不播放时竖屏
+        }
     }
 
     private void refMenu(final String url) {
         for (int i = 0; i < data.size(); i++) {
             data.get(i).setTargetUrl(webView.getUrl());
+        }
+    }
+
+    public class MyWebClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            webView.loadUrl(url);
+            showProgressDialog("加载中...");
+            return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            dismissProgressDialog();
+            refMenu(url);
         }
     }
 
@@ -248,7 +247,7 @@ public class WebVideoPlayerActyProxy extends BaseProxy implements SwipeRefreshLa
     /**
      * 全屏容器界面
      */
-    static class FullscreenHolder extends FrameLayout {
+    public static class FullscreenHolder extends FrameLayout {
 
         public FullscreenHolder(Context ctx) {
             super(ctx);
